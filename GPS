@@ -1,0 +1,41 @@
+#include <SoftwareSerial.h>  //Muestreo de datos Serial
+#include <TinyGPS.h>         //Separacion de datos del GPS
+
+  TinyGPS gps;  //Variable GPS
+  SoftwareSerial sgps(4,3);
+  //TX 4 y RX 3    
+  int num=0;
+  unsigned long chars;
+  unsigned short sentences, failed_checksum;
+
+  void setup()
+  {
+   Serial.begin(115200);  
+   sgps.begin(9600);
+   
+   Serial.println("INFORMACION DEL GPS");
+  }
+
+  void loop()
+  {
+   while(sgps.available()) 
+   {
+    
+    int charac = sgps.read(); //Caracter de lectura para el GPS
+    
+    if(gps.encode(charac)) 
+    {
+     float latitud, longitud;
+     gps.f_get_position(&latitud, &longitud);
+     num++;
+     Serial.print("Latitud: "); //Latitud
+     Serial.println(latitud,6);
+     Serial.print("Longitud: ");//Longitud
+     Serial.println(longitud,6);
+
+     Serial.println(num);
+     gps.stats(&chars, &sentences, &failed_checksum);
+     delay(1000);//Periodo de muestreo de 1s
+    }
+   }
+  }
