@@ -1,0 +1,37 @@
+volatile int NumPulsos;
+int PinSensor = 2;
+float K = 6;
+void ContarPulsos() {
+  NumPulsos++;
+}
+int ObtenerFrecuencia() {
+  int frecuencia;
+  NumPulsos = 0;
+  interrupts();
+  delay(1000);
+  noInterrupts();
+  frecuencia = NumPulsos;
+  return frecuencia;
+}
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  pinMode(PinSensor, INPUT);
+  attachInterrupt(0, ContarPulsos, RISING);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  float frecuencia = ObtenerFrecuencia();
+  float caudal_L_m = frecuencia / K;
+  float caudal_L_h = caudal_L_m * 60;
+  Serial.print("Frecuencia: ");
+  Serial.print(frecuencia, 0);
+  Serial.print("Hz  ");
+  Serial.print("Caudal: ");
+  Serial.print(caudal_L_m, 4);
+  Serial.print("L/m ");
+  Serial.print("Caudal: ");
+  Serial.print(caudal_L_h, 4);
+  Serial.println("L/h");
+}
